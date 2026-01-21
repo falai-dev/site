@@ -30,3 +30,5 @@ bun.lockb
 src/content-metadata.json
 
 falai-agent-firebase-adminsdk-fbsvc-887821e1a2.json
+
+.firebase/*
