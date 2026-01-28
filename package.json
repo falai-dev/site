@@ -13,7 +13,7 @@
     "deploy": "bun run build && firebase deploy --only hosting"
   },
   "dependencies": {
-    "@falai/agent": "0.1.0-alpha3",
+    "@falai/agent": "1",
     "animate.css": "^4.1.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
