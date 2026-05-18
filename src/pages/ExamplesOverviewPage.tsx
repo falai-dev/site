@@ -1,31 +1,31 @@
 import { Link } from "react-router-dom";
-import contentMetadata from "../content-metadata.json";
+import { examples } from "../lib/content";
 
 export function ExamplesOverviewPage() {
   return (
-    <div className="examples-overview-page">
-      <div className="overview-header">
+    <div className="overview">
+      <header className="overview__header">
         <h1>Examples</h1>
-        <p>Code examples and practical implementations using @falai/agent</p>
-      </div>
+        <p>Runnable code that shows the framework in action.</p>
+      </header>
 
-      <div className="categories-grid">
-        {contentMetadata.examples.map((category) => (
-          <div key={category.slug} className="category-card">
+      <div className="overview__grid">
+        {examples.map((category) => (
+          <article key={category.slug} className="overview-card">
             <h2>{category.title}</h2>
-            <ul className="category-items">
-              {category.items.map((example) => (
-                <li key={example.slug}>
-                  <Link to={`/examples/${category.slug}/${example.slug}`}>
-                    {example.title}
-                    {'language' in example && (
-                      <span className="language-badge">{example.language}</span>
+            <ul>
+              {category.items.map((item) => (
+                <li key={`${category.slug}-${item.slug}`}>
+                  <Link to={`/examples/${category.slug}/${item.slug}`}>
+                    <span>{item.title}</span>
+                    {item.language && (
+                      <span className="badge badge--example">{item.language}</span>
                     )}
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
+          </article>
         ))}
       </div>
     </div>

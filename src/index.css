@@ -1,1 +1,145 @@
-/* Reset and base styles are in App.css */
+/*
+ * Design tokens and global resets live here. Component styles live in App.css.
+ *
+ * Type system uses native system fonts (no web font payload) for a fast,
+ * platform-native feel. Mono uses ui-monospace.
+ */
+
+:root {
+    color-scheme: dark;
+
+    /* Surface palette — near-black neutrals with a hint of cool blue. */
+    --color-bg: #08090b;
+    --color-bg-elevated: #0d0e11;
+    --color-bg-raised: #131418;
+    --color-bg-hover: #181a1f;
+
+    /* Text */
+    --color-text: #e6e7ea;
+    --color-text-muted: #a3a6ad;
+    --color-text-dim: #6e7177;
+
+    /* Lines */
+    --color-border: #1f2127;
+    --color-border-strong: #2a2d34;
+
+    /* Accent — single restrained indigo with a complementary tint for highlights. */
+    --color-accent: #818cf8;
+    --color-accent-strong: #6366f1;
+    --color-accent-soft: rgba(129, 140, 248, 0.12);
+
+    /* Doc-type badges. Muted. Each gets a subtle tint, not a full color. */
+    --badge-overview: #a3a6ad;
+    --badge-tutorial: #34d399;
+    --badge-guide: #818cf8;
+    --badge-reference: #f59e0b;
+    --badge-concept: #f472b6;
+    --badge-migration: #94a3b8;
+    --badge-meta: #6e7177;
+    --badge-example: #22d3ee;
+
+    /* Layout */
+    --header-height: 56px;
+    --sidebar-width: 280px;
+    --max-width: 1200px;
+
+    /* Type — modular scale, system stack. */
+    --font-sans:
+        -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", "Roboto", "Helvetica Neue",
+        Arial, sans-serif;
+    --font-mono:
+        ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+
+    /* Motion */
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-height) + 1rem);
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+code,
+pre,
+kbd,
+samp {
+    font-family: var(--font-mono);
+}
+
+a {
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+button {
+    font-family: inherit;
+}
+
+::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-text);
+}
+
+/* Subtle scrollbars (WebKit). */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-dim);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}

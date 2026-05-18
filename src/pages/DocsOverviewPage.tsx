@@ -1,28 +1,31 @@
 import { Link } from "react-router-dom";
-import contentMetadata from "../content-metadata.json";
+import { docs, docTypeLabel } from "../lib/content";
 
 export function DocsOverviewPage() {
   return (
-    <div className="docs-overview-page">
-      <div className="overview-header">
+    <div className="overview">
+      <header className="overview__header">
         <h1>Documentation</h1>
-        <p>Comprehensive guides and API documentation for @falai/agent</p>
-      </div>
+        <p>Guides, references, and architecture notes for @falai/agent.</p>
+      </header>
 
-      <div className="categories-grid">
-        {contentMetadata.docs.map((category) => (
-          <div key={category.slug} className="category-card">
+      <div className="overview__grid">
+        {docs.map((category) => (
+          <article key={category.slug} className="overview-card">
             <h2>{category.title}</h2>
-            <ul className="category-items">
-              {category.items.map((doc) => (
-                <li key={doc.slug}>
-                  <Link to={`/docs/${category.slug}/${doc.slug}`}>
-                    {doc.title}
+            <ul>
+              {category.items.map((item) => (
+                <li key={`${category.slug}-${item.slug}`}>
+                  <Link to={`/docs/${category.slug}/${item.slug}`}>
+                    <span>{item.title}</span>
+                    <span className={`badge badge--${item.type}`}>
+                      {docTypeLabel[item.type]}
+                    </span>
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
+          </article>
         ))}
       </div>
     </div>

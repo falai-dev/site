@@ -7,14 +7,14 @@
     "dev": "bun run generate:metadata && vite",
     "build": "bun run generate:metadata && tsc -b && vite build",
     "generate:metadata": "bun scripts/generate-content-metadata.ts",
+    "sync": "bun update @falai/agent --latest && bun run generate:metadata",
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "deploy": "bun run build && firebase deploy --only hosting"
   },
   "dependencies": {
-    "@falai/agent": "^1.2.0",
-    "animate.css": "^4.1.1",
+    "@falai/agent": "^1.2.8",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-markdown": "^10.1.0",

@@ -1,62 +1,104 @@
+import { useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import contentMetadata from "../content-metadata.json";
+import { docs, examples, docTypeLabel, type ContentCategory, type ContentItem } from "../lib/content";
 
-export function Sidebar() {
+interface SidebarProps {
+  onNavigate?: () => void;
+}
+
+function filterCategories(categories: ContentCategory[], query: string): ContentCategory[] {
+  if (!query) return categories;
+  const needle = query.trim().toLowerCase();
+  return categories
+    .map((cat) => ({
+      ...cat,
+      items: cat.items.filter(
+        (item) =>
+          item.title.toLowerCase().includes(needle) ||
+          item.slug.includes(needle) ||
+          item.type.includes(needle)
+      ),
+    }))
+    .filter((cat) => cat.items.length > 0);
+}
+
+function NavList({
+  categories,
+  basePath,
+  query,
+  onNavigate,
+}: {
+  categories: ContentCategory[];
+  basePath: "/docs" | "/examples";
+  query: string;
+  onNavigate?: () => void;
+}) {
   const location = useLocation();
+  const filtered = useMemo(() => filterCategories(categories, query), [categories, query]);
 
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
-
-
+  if (filtered.length === 0) {
+    return <p className="sidebar__empty">No matches.</p>;
+  }
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-section">
-        <h3>Documentation</h3>
-        <nav>
-          {contentMetadata.docs.map((category) => (
-            <div key={category.slug} className="sidebar-category">
-              <h4 className="sidebar-category-title">{category.title}</h4>
-              <ul>
-                {category.items.map((doc) => (
-                  <li key={doc.slug}>
-                    <Link
-                      to={`/docs/${category.slug}/${doc.slug}`}
-                      className={isActive(`/docs/${category.slug}/${doc.slug}`) ? "active" : ""}
-                    >
-                      {doc.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </nav>
+    <>
+      {filtered.map((category) => (
+        <div key={category.slug} className="sidebar__group">
+          <h4 className="sidebar__group-title">{category.title}</h4>
+          <ul className="sidebar__items">
+            {category.items.map((item: ContentItem) => {
+              const to = `${basePath}/${category.slug}/${item.slug}`;
+              const active = location.pathname === to;
+              return (
+                <li key={`${category.slug}-${item.slug}`}>
+                  <Link
+                    to={to}
+                    className={`sidebar__link${active ? " is-active" : ""}`}
+                    onClick={onNavigate}
+                  >
+                    <span className="sidebar__link-label">{item.title}</span>
+                    <span className={`badge badge--${item.type}`}>
+                      {item.language ? item.language : docTypeLabel[item.type]}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </>
+  );
+}
+
+export function Sidebar({ onNavigate }: SidebarProps) {
+  const [query, setQuery] = useState("");
+
+  return (
+    <aside className="sidebar" aria-label="Documentation navigation">
+      <div className="sidebar__search">
+        <input
+          type="search"
+          placeholder="Filter…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          aria-label="Filter documentation"
+        />
       </div>
 
-      <div className="sidebar-section">
-        <h3>Examples</h3>
+      <section className="sidebar__section">
+        <h3 className="sidebar__section-title">Documentation</h3>
         <nav>
-          {contentMetadata.examples.map((category) => (
-            <div key={category.slug} className="sidebar-category">
-              <h4 className="sidebar-category-title">{category.title}</h4>
-              <ul>
-                {category.items.map((example) => (
-                  <li key={example.slug}>
-                    <Link
-                      to={`/examples/${category.slug}/${example.slug}`}
-                      className={isActive(`/examples/${category.slug}/${example.slug}`) ? "active" : ""}
-                    >
-                      {example.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <NavList categories={docs} basePath="/docs" query={query} onNavigate={onNavigate} />
         </nav>
-      </div>
+      </section>
+
+      <section className="sidebar__section">
+        <h3 className="sidebar__section-title">Examples</h3>
+        <nav>
+          <NavList categories={examples} basePath="/examples" query={query} onNavigate={onNavigate} />
+        </nav>
+      </section>
     </aside>
   );
 }
