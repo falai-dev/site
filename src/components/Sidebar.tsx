@@ -73,32 +73,37 @@ function NavList({
 
 export function Sidebar({ onNavigate }: SidebarProps) {
   const [query, setQuery] = useState("");
+  const location = useLocation();
+
+  const isExamples = location.pathname.startsWith("/examples");
 
   return (
-    <aside className="sidebar" aria-label="Documentation navigation">
+    <aside className="sidebar" aria-label={isExamples ? "Examples navigation" : "Documentation navigation"}>
       <div className="sidebar__search">
         <input
           type="search"
           placeholder="Filter…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          aria-label="Filter documentation"
+          aria-label={isExamples ? "Filter examples" : "Filter documentation"}
         />
       </div>
 
-      <section className="sidebar__section">
-        <h3 className="sidebar__section-title">Documentation</h3>
-        <nav>
-          <NavList categories={docs} basePath="/docs" query={query} onNavigate={onNavigate} />
-        </nav>
-      </section>
-
-      <section className="sidebar__section">
-        <h3 className="sidebar__section-title">Examples</h3>
-        <nav>
-          <NavList categories={examples} basePath="/examples" query={query} onNavigate={onNavigate} />
-        </nav>
-      </section>
+      {isExamples ? (
+        <section className="sidebar__section">
+          <h3 className="sidebar__section-title">Examples</h3>
+          <nav>
+            <NavList categories={examples} basePath="/examples" query={query} onNavigate={onNavigate} />
+          </nav>
+        </section>
+      ) : (
+        <section className="sidebar__section">
+          <h3 className="sidebar__section-title">Documentation</h3>
+          <nav>
+            <NavList categories={docs} basePath="/docs" query={query} onNavigate={onNavigate} />
+          </nav>
+        </section>
+      )}
     </aside>
   );
 }
