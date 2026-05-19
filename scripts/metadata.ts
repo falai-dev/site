@@ -346,21 +346,24 @@ function generateDocsMetadata(): CategoryMetadata[] {
   const categories: CategoryMetadata[] = [];
   const entries = readdirSync(DOCS_SOURCE);
 
-  // Top-level files go into an "Overview" category only if there's more than just a README.
-  // A single root README is used as the DocsOverviewPage content instead.
+  // Top-level files become the "Overview" category.
   const rootItems: ContentItem[] = [];
+  let overviewTitle = "Overview";
   for (const entry of entries) {
     const full = join(DOCS_SOURCE, entry);
     if (!statSync(full).isFile()) continue;
     const item = readDocItem(full, DOCS_SOURCE, "/content/docs");
-    if (item) rootItems.push(item);
+    if (item) {
+      if (/^readme\.[a-z]+$/i.test(entry) && item.title && item.title !== "Overview") {
+        overviewTitle = item.title;
+      }
+      rootItems.push(item);
+    }
   }
-  // Only include the overview category if there are non-README top-level docs
-  const nonReadmeRootItems = rootItems.filter((i) => i.slug !== "readme");
-  if (nonReadmeRootItems.length > 0) {
+  if (rootItems.length > 0) {
     categories.push({
       slug: "overview",
-      title: "Overview",
+      title: overviewTitle,
       items: sortItems(dedupeBySlug(rootItems)),
     });
   }
