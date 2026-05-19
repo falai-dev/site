@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import rehypeHighlight from "rehype-highlight";
-import "highlight.js/styles/github-dark.css";
+import { CodeBlock } from "./CodeBlock";
 
 interface CodeViewerProps {
   path: string;
@@ -13,7 +11,6 @@ export function CodeViewer({ path, language, title }: CodeViewerProps) {
   const [content, setContent] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -41,16 +38,6 @@ export function CodeViewer({ path, language, title }: CodeViewerProps) {
     };
   }, [path]);
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(content);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
-    } catch {
-      /* noop — clipboard unavailable */
-    }
-  };
-
   if (loading) {
     return (
       <div className="state-block state-block--loading" role="status" aria-live="polite">
@@ -69,22 +56,13 @@ export function CodeViewer({ path, language, title }: CodeViewerProps) {
     );
   }
 
-  const fenced = `\`\`\`${language}\n${content}\n\`\`\``;
-
   return (
-    <section className="code-viewer">
-      <header className="code-viewer__header">
-        <div>
-          <span className="code-viewer__lang">{language}</span>
-          <h1 className="code-viewer__title">{title}</h1>
-        </div>
-        <button type="button" className="code-viewer__copy" onClick={handleCopy}>
-          {copied ? "Copied" : "Copy"}
-        </button>
+    <section className="example-page-content">
+      <header className="example-page-header">
+        <span className="example-page-lang">{language}</span>
+        <h1 className="example-page-title">{title}</h1>
       </header>
-      <div className="code-viewer__body">
-        <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{fenced}</ReactMarkdown>
-      </div>
+      <CodeBlock code={content} language={language} filename={`${title}.${language === "prisma" ? "prisma" : "ts"}`} />
     </section>
   );
 }

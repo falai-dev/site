@@ -2,11 +2,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import rehypeHighlight from "rehype-highlight";
 import rehypeRaw from "rehype-raw";
 import { rehypeGithubSlug } from "../utils/rehype-github-slug";
 import { rewriteMarkdownLink } from "../lib/content";
-import "highlight.js/styles/github-dark.css";
+import { MarkdownCode } from "./CodeBlock";
 
 interface MarkdownViewerProps {
   /** Path to the markdown file under /content (e.g. /content/docs/foo.md). */
@@ -22,7 +21,6 @@ function buildLinkComponent(currentPath: string) {
   return function MarkdownLink({ href, children, ...rest }: AnchorProps) {
     if (!href) return <a {...rest}>{children}</a>;
 
-    // External links open in a new tab.
     if (/^[a-z]+:\/\//i.test(href) || href.startsWith("mailto:")) {
       return (
         <a href={href} target="_blank" rel="noopener noreferrer" {...rest}>
@@ -31,7 +29,6 @@ function buildLinkComponent(currentPath: string) {
       );
     }
 
-    // Pure anchor stays on the page.
     if (href.startsWith("#")) {
       return (
         <a href={href} {...rest}>
@@ -40,7 +37,6 @@ function buildLinkComponent(currentPath: string) {
       );
     }
 
-    // Internal cross-document link — try to map back to a known route.
     const internal = rewriteMarkdownLink(currentPath, href);
     if (internal) {
       const target = internal.hash ? `${internal.to}#${internal.hash}` : internal.to;
@@ -51,7 +47,6 @@ function buildLinkComponent(currentPath: string) {
       );
     }
 
-    // Fallback to plain anchor (likely a static asset).
     return (
       <a href={href} {...rest}>
         {children}
@@ -77,7 +72,6 @@ export function MarkdownViewer({ path }: MarkdownViewerProps) {
       })
       .then((text) => {
         if (cancelled) return;
-        // Strip frontmatter from the rendered output.
         const stripped = text.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
         setContent(stripped);
         setLoading(false);
@@ -115,8 +109,8 @@ export function MarkdownViewer({ path }: MarkdownViewerProps) {
     <article className="markdown">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw, rehypeGithubSlug, rehypeHighlight]}
-        components={{ a: buildLinkComponent(path) }}
+        rehypePlugins={[rehypeRaw, rehypeGithubSlug]}
+        components={{ a: buildLinkComponent(path), code: MarkdownCode }}
       >
         {content}
       </ReactMarkdown>

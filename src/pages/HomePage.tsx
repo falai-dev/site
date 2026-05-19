@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { CodeBlock } from "../components/CodeBlock";
 
 const QUICKSTART = `import { Agent, OpenAIProvider } from "@falai/agent";
 
@@ -86,17 +87,7 @@ export function HomePage() {
           <h2>Quick start</h2>
           <p>One agent, one route, one extraction. That's the whole thing.</p>
         </div>
-        <div className="quickstart-card">
-          <div className="quickstart-card__header">
-            <span className="quickstart-card__dot" />
-            <span className="quickstart-card__dot" />
-            <span className="quickstart-card__dot" />
-            <span className="quickstart-card__file">agent.ts</span>
-          </div>
-          <pre className="quickstart-card__code">
-            <code>{QUICKSTART}</code>
-          </pre>
-        </div>
+        <CodeBlock code={QUICKSTART} language="typescript" filename="agent.ts" />
       </section>
 
       <section className="landing__features">
