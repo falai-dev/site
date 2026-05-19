@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { CodeBlock } from "../components/CodeBlock";
+import { LazyCodeBlock } from "../components/CodeBlock.lazy";
 
 const QUICKSTART = `import { Agent, OpenAIProvider } from "@falai/agent";
 
@@ -87,7 +87,7 @@ export function HomePage() {
           <h2>Quick start</h2>
           <p>One agent, one route, one extraction. That's the whole thing.</p>
         </div>
-        <CodeBlock code={QUICKSTART} language="typescript" filename="agent.ts" />
+        <LazyCodeBlock code={QUICKSTART} language="typescript" filename="agent.ts" />
       </section>
 
       <section className="landing__features">
