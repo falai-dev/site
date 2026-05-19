@@ -1,6 +1,6 @@
-import { useParams, Navigate } from "react-router-dom";
+import { useParams, Navigate, Link } from "react-router-dom";
 import { MarkdownViewer } from "../components/MarkdownViewer";
-import { docs } from "../lib/content";
+import { docs, getNavNeighbors } from "../lib/content";
 
 export function DocPage() {
   const { categorySlug, itemSlug } = useParams<{ categorySlug?: string; itemSlug?: string }>();
@@ -16,9 +16,25 @@ export function DocPage() {
     return <Navigate to="/docs" replace />;
   }
 
+  const { prev, next } = getNavNeighbors(docs, "/docs", categorySlug, itemSlug);
+
   return (
     <div className="doc-page">
       <MarkdownViewer path={doc.path} />
+      <nav className="page-nav" aria-label="Page navigation">
+        {prev ? (
+          <Link to={prev.to} className="page-nav__link page-nav__link--prev">
+            <span className="page-nav__direction">Previous</span>
+            <span className="page-nav__title">{prev.title}</span>
+          </Link>
+        ) : <span />}
+        {next ? (
+          <Link to={next.to} className="page-nav__link page-nav__link--next">
+            <span className="page-nav__direction">Next</span>
+            <span className="page-nav__title">{next.title}</span>
+          </Link>
+        ) : <span />}
+      </nav>
     </div>
   );
 }

@@ -16,7 +16,11 @@ export interface ContentItem {
     path: string;
     type: DocType;
     order: number;
+    hidden?: boolean;
     language?: string;
+    description?: string;
+    teaches?: string;
+    readAfter?: string;
 }
 
 export interface ContentCategory {
@@ -34,6 +38,37 @@ export interface ResolvedRoute {
     categorySlug: string;
     itemSlug: string;
     item: ContentItem;
+}
+
+export interface NavNeighbors {
+    prev: { to: string; title: string } | null;
+    next: { to: string; title: string } | null;
+}
+
+/**
+ * Flatten categories into a linear reading order, skipping hidden items.
+ * Returns prev/next links for a given category+item slug.
+ */
+export function getNavNeighbors(
+    categories: ContentCategory[],
+    basePath: "/docs" | "/examples",
+    categorySlug: string,
+    itemSlug: string,
+): NavNeighbors {
+    const flat: { to: string; title: string }[] = [];
+    for (const cat of categories) {
+        for (const item of cat.items) {
+            if (item.hidden) continue;
+            flat.push({ to: `${basePath}/${cat.slug}/${item.slug}`, title: item.title });
+        }
+    }
+    const idx = flat.findIndex(
+        (entry) => entry.to === `${basePath}/${categorySlug}/${itemSlug}`
+    );
+    return {
+        prev: idx > 0 ? flat[idx - 1] : null,
+        next: idx >= 0 && idx < flat.length - 1 ? flat[idx + 1] : null,
+    };
 }
 
 /**

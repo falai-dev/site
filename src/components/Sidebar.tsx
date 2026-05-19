@@ -7,16 +7,20 @@ interface SidebarProps {
 }
 
 function filterCategories(categories: ContentCategory[], query: string): ContentCategory[] {
-  if (!query) return categories;
   const needle = query.trim().toLowerCase();
   return categories
     .map((cat) => ({
       ...cat,
       items: cat.items.filter(
-        (item) =>
-          item.title.toLowerCase().includes(needle) ||
-          item.slug.includes(needle) ||
-          item.type.includes(needle)
+        (item) => {
+          if (item.hidden) return false;
+          if (!needle) return true;
+          return (
+            item.title.toLowerCase().includes(needle) ||
+            item.slug.includes(needle) ||
+            item.type.includes(needle)
+          );
+        }
       ),
     }))
     .filter((cat) => cat.items.length > 0);

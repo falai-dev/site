@@ -22,7 +22,11 @@ interface ContentItem {
   path: string;
   type: ContentType;
   order: number;
+  hidden?: boolean;
   language?: string;
+  description?: string;
+  teaches?: string;
+  readAfter?: string;
 }
 
 interface CategoryMetadata {
@@ -43,6 +47,19 @@ const PACKAGE_JSON = "node_modules/@falai/agent/package.json";
 const OUTPUT_FILE = "src/content-metadata.json";
 
 const DEFAULT_ORDER = 1000;
+
+/**
+ * Fixed category ordering for the docs sidebar.
+ * Categories not listed here appear last, sorted alphabetically.
+ */
+const CATEGORY_ORDER: Record<string, number> = {
+  overview: 0,
+  start: 1,
+  guides: 2,
+  concepts: 3,
+  reference: 4,
+  migration: 5,
+};
 
 // ---------- helpers ----------
 
@@ -72,16 +89,18 @@ function titleCase(str: string): string {
  * Minimal YAML frontmatter parser. Supports flat key/value pairs only.
  * Returns parsed data and stripped body.
  */
-function parseFrontmatter(text: string): { data: Record<string, string | number>; body: string } {
+function parseFrontmatter(text: string): { data: Record<string, string | number | boolean>; body: string } {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
   if (!match) return { data: {}, body: text };
 
-  const data: Record<string, string | number> = {};
+  const data: Record<string, string | number | boolean> = {};
   for (const line of match[1].split(/\r?\n/)) {
     const kv = line.match(/^([A-Za-z0-9_-]+)\s*:\s*(.*)$/);
     if (!kv) continue;
     let raw = kv[2].trim();
     raw = raw.replace(/^["'](.*)["']$/, "$1");
+    if (raw === "true") { data[kv[1]] = true; continue; }
+    if (raw === "false") { data[kv[1]] = false; continue; }
     const numeric = Number(raw);
     data[kv[1]] = !isNaN(numeric) && raw !== "" ? numeric : raw;
   }
@@ -106,16 +125,13 @@ function inferDocType(relativePath: string): ContentType {
   if (segments.length === 1) return "overview";
 
   const top = segments[0];
-  const second = segments[1];
 
-  if (top === "core") return "reference";
-  if (top === "api") return "reference";
-  if (top === "architecture") return "concept";
-  if (top === "guides") {
-    if (second === "getting-started") return "tutorial";
-    if (second === "migration") return "migration";
-    return "guide";
-  }
+  if (top === "start") return "tutorial";
+  if (top === "guides") return "guide";
+  if (top === "concepts") return "concept";
+  if (top === "reference") return "reference";
+  if (top === "migration") return "migration";
+
   return "guide";
 }
 
@@ -123,13 +139,6 @@ function inferDocType(relativePath: string): ContentType {
  * Build a unique, route-safe slug from the relative path within a category.
  * Strips the extension, joins folders with hyphens, and special-cases README.md
  * to use the parent folder name.
- *
- * Examples (relative to the docs root):
- *  - core/agent/README.md             -> agent
- *  - core/agent/context-management.md -> agent-context-management
- *  - guides/migration/README.md       -> migration
- *  - architecture/data-extraction.md  -> data-extraction
- *  - error-handling.md                -> error-handling
  */
 function buildSlugFromRelativePath(relativeWithinCategory: string): string {
   const segments = relativeWithinCategory.split("/").filter(Boolean);
@@ -152,6 +161,74 @@ function buildTitle(relativeWithinCategory: string, frontmatterTitle?: string): 
     return "Overview";
   }
   return titleCase(basename(file, extname(file)));
+}
+
+/**
+ * Build a title for examples — strips leading numeric prefix (e.g. "01-") before title-casing.
+ */
+function buildExampleTitle(file: string, frontmatterTitle?: string): string {
+  if (frontmatterTitle && typeof frontmatterTitle === "string") return frontmatterTitle;
+  const ext = extname(file);
+  const cleanName = basename(file, ext).replace(/^\d+-/, "");
+  return titleCase(cleanName);
+}
+
+// ---------- JSDoc parsing for examples ----------
+
+interface ExampleMeta {
+  description?: string;
+  teaches?: string;
+  readAfter?: string;
+}
+
+/**
+ * Parse JSDoc header from an example file. Supports two styles:
+ * 1. @intent / @teaches / @readAfter annotations (single-line JSDoc)
+ * 2. Prose with "Teaches:" / "Read after:" / "Read next:" prefixes (multi-line)
+ */
+function parseExampleJSDoc(text: string): ExampleMeta {
+  // Match first JSDoc block
+  const match = text.match(/\/\*\*[\s\S]*?\*\//);
+  if (!match) return {};
+
+  const block = match[0];
+  const meta: ExampleMeta = {};
+
+  // Style 1: @annotations
+  const intentMatch = block.match(/@intent\s+(.+?)(?:\s*\n|\s*\*\/|\s*\*\s*@)/);
+  if (intentMatch) {
+    meta.description = intentMatch[1].replace(/\s*\*\s*$/, "").trim();
+  }
+
+  const teachesMatch = block.match(/@teaches\s+(.+?)(?:\s*\n|\s*\*\/|\s*\*\s*@)/);
+  if (teachesMatch) {
+    meta.teaches = teachesMatch[1].replace(/\s*\*\s*$/, "").trim();
+  }
+
+  const readAfterMatch = block.match(/@readAfter\s+(.+?)(?:\s*\n|\s*\*\/|\s*\*\s*@)/);
+  if (readAfterMatch) {
+    meta.readAfter = readAfterMatch[1].replace(/\s*\*\s*$/, "").trim();
+  }
+
+  // Style 2: prose prefixes (only fill if annotations didn't match)
+  if (!meta.description) {
+    // First meaningful line after opening /** or * 
+    const lines = block.split(/\r?\n/).map((l) => l.replace(/^\s*\*\s?/, "").replace(/^\/\*\*\s?/, "").replace(/\*\/\s*$/, "").trim()).filter(Boolean);
+    const firstLine = lines.find((l) => !l.startsWith("@") && !l.toLowerCase().startsWith("teaches") && !l.toLowerCase().startsWith("read "));
+    if (firstLine) meta.description = firstLine;
+  }
+
+  if (!meta.teaches) {
+    const teachLine = block.match(/Teaches:\s*(.+)/i);
+    if (teachLine) meta.teaches = teachLine[1].replace(/\s*\*\s*$/, "").trim();
+  }
+
+  if (!meta.readAfter) {
+    const readLine = block.match(/Read (?:after|next):\s*(.+)/i);
+    if (readLine) meta.readAfter = readLine[1].replace(/\s*\*\s*$/, "").trim();
+  }
+
+  return meta;
 }
 
 // ---------- collection ----------
@@ -181,13 +258,20 @@ function readDocItem(absoluteFile: string, categoryRoot: string, urlPrefix: stri
   const fullRelativeFromDocsRoot = relative(DOCS_SOURCE, absoluteFile).split(sep).join("/");
   const type: ContentType = isContentType(data.type) ? data.type : inferDocType(fullRelativeFromDocsRoot);
 
-  return {
+  const item: ContentItem = {
     slug,
     title,
     path: `${urlPrefix}/${relWithinCategory}`,
     type,
     order,
   };
+
+  // Support `sidebar: false` in frontmatter to hide from nav while keeping route alive
+  if (data.sidebar === false || data.sidebar === "false") {
+    item.hidden = true;
+  }
+
+  return item;
 }
 
 function readExampleItem(absoluteFile: string, categoryRoot: string, urlPrefix: string): ContentItem | null {
@@ -196,17 +280,33 @@ function readExampleItem(absoluteFile: string, categoryRoot: string, urlPrefix: 
   const relWithinCategory = relative(categoryRoot, absoluteFile).split(sep).join("/");
   const slug = buildSlugFromRelativePath(relWithinCategory);
   if (!slug) return null;
-  const title = buildTitle(relWithinCategory);
+
+  const file = basename(absoluteFile);
+  const title = buildExampleTitle(file);
   const language = ext === ".prisma" ? "prisma" : "typescript";
 
-  return {
+  // Use numeric prefix for ordering if present
+  const numericPrefix = basename(absoluteFile).match(/^(\d+)-/);
+  const order = numericPrefix ? parseInt(numericPrefix[1], 10) : DEFAULT_ORDER;
+
+  // Parse JSDoc metadata
+  const text = readFileSync(absoluteFile, "utf-8");
+  const jsdoc = parseExampleJSDoc(text);
+
+  const item: ContentItem = {
     slug,
     title,
     path: `${urlPrefix}/${relWithinCategory}`,
     type: "example",
-    order: DEFAULT_ORDER,
+    order,
     language,
   };
+
+  if (jsdoc.description) item.description = jsdoc.description;
+  if (jsdoc.teaches) item.teaches = jsdoc.teaches;
+  if (jsdoc.readAfter) item.readAfter = jsdoc.readAfter;
+
+  return item;
 }
 
 function dedupeBySlug<T extends { slug: string; title: string }>(items: T[]): T[] {
@@ -231,13 +331,23 @@ function sortItems(items: ContentItem[]): ContentItem[] {
   });
 }
 
+function sortCategories(categories: CategoryMetadata[]): CategoryMetadata[] {
+  return [...categories].sort((a, b) => {
+    const aOrder = CATEGORY_ORDER[a.slug] ?? 99;
+    const bOrder = CATEGORY_ORDER[b.slug] ?? 99;
+    if (aOrder !== bOrder) return aOrder - bOrder;
+    return a.title.localeCompare(b.title);
+  });
+}
+
 // ---------- generation ----------
 
 function generateDocsMetadata(): CategoryMetadata[] {
   const categories: CategoryMetadata[] = [];
   const entries = readdirSync(DOCS_SOURCE);
 
-  // Top-level files become an "Overview" category.
+  // Top-level files go into an "Overview" category only if there's more than just a README.
+  // A single root README is used as the DocsOverviewPage content instead.
   const rootItems: ContentItem[] = [];
   for (const entry of entries) {
     const full = join(DOCS_SOURCE, entry);
@@ -245,7 +355,9 @@ function generateDocsMetadata(): CategoryMetadata[] {
     const item = readDocItem(full, DOCS_SOURCE, "/content/docs");
     if (item) rootItems.push(item);
   }
-  if (rootItems.length > 0) {
+  // Only include the overview category if there are non-README top-level docs
+  const nonReadmeRootItems = rootItems.filter((i) => i.slug !== "readme");
+  if (nonReadmeRootItems.length > 0) {
     categories.push({
       slug: "overview",
       title: "Overview",
@@ -272,7 +384,7 @@ function generateDocsMetadata(): CategoryMetadata[] {
     }
   }
 
-  return categories;
+  return sortCategories(categories);
 }
 
 function generateExamplesMetadata(): CategoryMetadata[] {
