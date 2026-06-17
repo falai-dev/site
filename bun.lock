@@ -5,7 +5,7 @@
     "": {
       "name": "falai-site",
       "dependencies": {
-        "@falai/agent": "^2.4.1",
+        "@falai/agent": "^2.4.2",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
         "react-markdown": "^10.1.0",
@@ -146,7 +146,7 @@
 
     "@eslint/plugin-kit": ["@eslint/plugin-kit@0.4.0", "", { "dependencies": { "@eslint/core": "^0.16.0", "levn": "^0.4.1" } }, "sha512-sB5uyeq+dwCWyPi31B2gQlVlo+j5brPlWx4yZBrEaRo/nhdDE8Xke1gsGgtiBdaBTxuTkceLVuVt/pclrasb0A=="],
 
-    "@falai/agent": ["@falai/agent@2.4.1", "", { "dependencies": { "@anthropic-ai/sdk": "^0.65.0", "@google/genai": "^2.7.0", "loglevel": "^1.9.2", "openai": "^6.3.0" }, "peerDependencies": { "@opensearch-project/opensearch": "^2.0.0", "@prisma/client": "^6.0.0", "better-sqlite3": "^11.0.0 || ^12.0.0", "ioredis": "^5.0.0", "mongodb": "^6.0.0", "pg": "^8.0.0" }, "optionalPeers": ["@opensearch-project/opensearch", "@prisma/client", "better-sqlite3", "ioredis", "mongodb", "pg"] }, "sha512-jM7daFCdaBUyZ0JJdG/DYyblfB24kG5q6wabhbDP8kNGwIAlIGJXAoSxBjnwpk1L5euF4SWz6Mi/72wi1raBOg=="],
+    "@falai/agent": ["@falai/agent@2.4.2", "", { "dependencies": { "@anthropic-ai/sdk": "^0.65.0", "@google/genai": "^2.7.0", "loglevel": "^1.9.2", "openai": "^6.3.0" }, "peerDependencies": { "@opensearch-project/opensearch": "^2.0.0", "@prisma/client": "^6.0.0", "better-sqlite3": "^11.0.0 || ^12.0.0", "ioredis": "^5.0.0", "mongodb": "^6.0.0", "pg": "^8.0.0" }, "optionalPeers": ["@opensearch-project/opensearch", "@prisma/client", "better-sqlite3", "ioredis", "mongodb", "pg"] }, "sha512-7HSypIfCpyXx4d+ekzmqVqngqmnK5LxtByOP4wnAe7NTjIDjdEHbiTaxtHJo/3kTqPn9EJlKUGWdlJeX92tZvA=="],
 
     "@google/genai": ["@google/genai@2.8.0", "", { "dependencies": { "google-auth-library": "^10.3.0", "p-retry": "^4.6.2", "protobufjs": "^7.5.4", "ws": "^8.18.0" }, "peerDependencies": { "@modelcontextprotocol/sdk": "^1.25.2" }, "optionalPeers": ["@modelcontextprotocol/sdk"] }, "sha512-pc2ayxqO5+O7AvnHBqpNHIk7PAZkHZgL31tbyx0gJZBSS9qPYiQoqwK7oYOw/ePmG6QY4EMSu+304vD5QlhXAw=="],
 
