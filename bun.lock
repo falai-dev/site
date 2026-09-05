@@ -5,7 +5,7 @@
     "": {
       "name": "falai-site",
       "dependencies": {
-        "@falai/agent": "^3.1.0",
+        "@falai/agent": "^3.1.1",
         "react": "^19.2.8",
         "react-dom": "^19.2.8",
         "react-markdown": "^10.1.0",
@@ -142,7 +142,7 @@
 
     "@eslint/plugin-kit": ["@eslint/plugin-kit@0.4.1", "", { "dependencies": { "@eslint/core": "^0.17.0", "levn": "^0.4.1" } }, "sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA=="],
 
-    "@falai/agent": ["@falai/agent@3.1.0", "", { "dependencies": { "@providerkit/core": "^0.4.1", "loglevel": "^1.9.2" }, "peerDependencies": { "@opensearch-project/opensearch": "^2.0.0", "@prisma/client": "^6.0.0", "better-sqlite3": "^11.0.0 || ^12.0.0", "ioredis": "^5.0.0", "mongodb": "^6.0.0", "pg": "^8.0.0" }, "optionalPeers": ["@opensearch-project/opensearch", "@prisma/client", "better-sqlite3", "ioredis", "mongodb", "pg"] }, "sha512-5ZG/8z1dGqk6Ku/WfI+RDb0HSoKZ2/g8FSlGNsqWElE6/DWLRj2JwSqjEJpDqoJrRC73rhpIJ55R11/ww9Exug=="],
+    "@falai/agent": ["@falai/agent@3.1.1", "", { "dependencies": { "@providerkit/core": "^0.4.3", "loglevel": "^1.9.2" }, "peerDependencies": { "@opensearch-project/opensearch": "^2.0.0", "@prisma/client": "^6.0.0", "better-sqlite3": "^11.0.0 || ^12.0.0", "ioredis": "^5.0.0", "mongodb": "^6.0.0", "pg": "^8.0.0" }, "optionalPeers": ["@opensearch-project/opensearch", "@prisma/client", "better-sqlite3", "ioredis", "mongodb", "pg"] }, "sha512-ervTK4ce/kjOdXnlhygxvbSSfWAsuLcsYFcVIDbc9oLjeI9uf6fmywBWNQfR77iUx/NX4Mtn2wrL6Old+/wSog=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 
@@ -162,7 +162,7 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
-    "@providerkit/core": ["@providerkit/core@0.4.1", "", { "peerDependencies": { "zod": "^4" }, "optionalPeers": ["zod"] }, "sha512-UeArf3aEkbPzINbAMy6+B6bS3i3Wbh1qAdgRsS3GCo6PvApwtAdla06Qz/MvsBpCNIUSs+V8HcvjVUPlyGOLqQ=="],
+    "@providerkit/core": ["@providerkit/core@0.4.3", "", { "peerDependencies": { "zod": "^4" }, "optionalPeers": ["zod"] }, "sha512-7512lVtJjGRJ0rWmr0ylIGZW4rHrjQHO+IiscgGvYFYdK+GIIKaKrpz79SyIsV0px7psLYyO9s5BZyZQQCbpTA=="],
 
     "@rolldown/pluginutils": ["@rolldown/pluginutils@1.0.0-rc.3", "", {}, "sha512-eybk3TjzzzV97Dlj5c+XrBFW57eTNhzod66y9HrBlzJ6NsCrWCp/2kaPS3K9wJmurBC0Tdw4yPjXKZqlznim3Q=="],
 
