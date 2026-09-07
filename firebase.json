@@ -1,16 +1,18 @@
 {
   "hosting": {
     "public": "dist",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "trailingSlash": false,
+    "comment": [
+      "No catch-all rewrite. Every route the site has is now a real prerendered file, written",
+      "from the same content metadata the router reads, so the rewrite's only remaining job was",
+      "answering unknown addresses with the landing page at HTTP 200 — a soft 404, which a search",
+      "engine indexes as a duplicate of the front door. Without it Firebase serves dist/404.html",
+      "with a real 404 status.",
+      "trailingSlash is false so /docs/reference/flow is served as itself. Firebase's default is",
+      "to 301 it to /docs/reference/flow/, and the address bar then disagrees with both the",
+      "canonical link in the page and the route the file was rendered for — which cost every",
+      "reader a redirect and threw away the prerendered markup instead of hydrating it."
     ]
   }
 }

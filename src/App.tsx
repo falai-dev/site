@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { Layout } from "./components/Layout";
 import { HomePage } from "./pages/HomePage";
@@ -26,24 +26,29 @@ function PageFallback() {
   );
 }
 
+/**
+ * The route table, with no router around it.
+ *
+ * The router is supplied by whoever renders this: `BrowserRouter` in `main.tsx`, `StaticRouter`
+ * in `entry-server.tsx`. That split is the whole reason the build can render these same routes
+ * to files — a `BrowserRouter` in here would need a history to browse, and the build has none.
+ */
 function App() {
   return (
-    <BrowserRouter>
-      <Suspense fallback={<PageFallback />}>
-        <Routes>
-          <Route element={<Layout bare />}>
-            <Route path="/" element={<HomePage />} />
-          </Route>
-          <Route element={<Layout />}>
-            <Route path="/docs" element={<DocsOverviewPage />} />
-            <Route path="/docs/:categorySlug/:itemSlug" element={<DocPage />} />
-            <Route path="/examples" element={<ExamplesOverviewPage />} />
-            <Route path="/examples/:categorySlug/:itemSlug" element={<ExamplePage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Route>
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+    <Suspense fallback={<PageFallback />}>
+      <Routes>
+        <Route element={<Layout bare />}>
+          <Route path="/" element={<HomePage />} />
+        </Route>
+        <Route element={<Layout />}>
+          <Route path="/docs" element={<DocsOverviewPage />} />
+          <Route path="/docs/:categorySlug/:itemSlug" element={<DocPage />} />
+          <Route path="/examples" element={<ExamplesOverviewPage />} />
+          <Route path="/examples/:categorySlug/:itemSlug" element={<ExamplePage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
+      </Routes>
+    </Suspense>
   );
 }
 

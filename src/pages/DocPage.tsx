@@ -20,7 +20,9 @@ export function DocPage() {
 
   return (
     <div className="doc-page">
-      <MarkdownViewer path={doc.path} />
+      {/* Keyed so moving between two docs remounts the viewer: it seeds its state from the
+          document the page was rendered with, and that seed is only right for one path. */}
+      <MarkdownViewer key={doc.path} path={doc.path} />
       <nav className="page-nav" aria-label="Page navigation">
         {prev ? (
           <Link to={prev.to} className="page-nav__link page-nav__link--prev">

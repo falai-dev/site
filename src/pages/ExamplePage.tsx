@@ -20,7 +20,13 @@ export function ExamplePage() {
 
   return (
     <div className="example-page">
-      <CodeViewer path={example.path} language={example.language} title={example.title} />
+      {/* Keyed for the same reason as the doc viewer: one seed, one path. */}
+      <CodeViewer
+        key={example.path}
+        path={example.path}
+        language={example.language}
+        title={example.title}
+      />
       <nav className="page-nav" aria-label="Page navigation">
         {prev ? (
           <Link to={prev.to} className="page-nav__link page-nav__link--prev">

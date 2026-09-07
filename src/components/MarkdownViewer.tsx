@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { rehypeGithubSlug } from "../utils/rehype-github-slug";
 import { rewriteMarkdownLink } from "../lib/content";
+import { useContentFile } from "../lib/content-file";
 import { MarkdownCode } from "./CodeBlock";
+
+/** Leading `---` block, which is metadata for the build and not prose for the reader. */
+const FRONTMATTER = /^---\r?\n[\s\S]*?\r?\n---\r?\n?/;
 
 interface MarkdownViewerProps {
   /** Path to the markdown file under /content (e.g. /content/docs/foo.md). */
@@ -56,36 +59,7 @@ function buildLinkComponent(currentPath: string) {
 }
 
 export function MarkdownViewer({ path }: MarkdownViewerProps) {
-  const [content, setContent] = useState<string>("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-
-    fetch(path)
-      .then((res) => {
-        if (!res.ok) throw new Error(`Failed to load content: ${res.statusText}`);
-        return res.text();
-      })
-      .then((text) => {
-        if (cancelled) return;
-        const stripped = text.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
-        setContent(stripped);
-        setLoading(false);
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        setError(err.message);
-        setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [path]);
+  const { text, loading, error } = useContentFile(path);
 
   if (loading) {
     return (
@@ -112,7 +86,7 @@ export function MarkdownViewer({ path }: MarkdownViewerProps) {
         rehypePlugins={[rehypeRaw, rehypeGithubSlug]}
         components={{ a: buildLinkComponent(path), code: MarkdownCode }}
       >
-        {content}
+        {text.replace(FRONTMATTER, "")}
       </ReactMarkdown>
     </article>
   );

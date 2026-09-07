@@ -2,8 +2,11 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 
-// https://vite.dev/config/
-export default defineConfig({
+// A function config because `build` runs twice: once for the browser bundle and once for the SSR
+// bundle `scripts/prerender.ts` imports (`vite build --ssr src/entry-server.tsx`). The second one
+// renders to strings and serves nobody, so copying half a megabyte of markdown next to it is pure
+// waste — the prerender reads that content out of `dist/`, where the browser gets it too.
+export default defineConfig(({ isSsrBuild }) => ({
   server: {
     open: true,
     port: 5173,
@@ -22,21 +25,25 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    viteStaticCopy({
-      targets: [
-        {
-          src: "node_modules/@falai/agent/docs",
-          dest: "content",
-        },
-        {
-          src: "node_modules/@falai/agent/examples",
-          dest: "content",
-        },
-        {
-          src: "node_modules/@falai/agent/README.md",
-          dest: "content",
-        },
-      ],
-    }),
+    ...(isSsrBuild
+      ? []
+      : [
+          viteStaticCopy({
+            targets: [
+              {
+                src: "node_modules/@falai/agent/docs",
+                dest: "content",
+              },
+              {
+                src: "node_modules/@falai/agent/examples",
+                dest: "content",
+              },
+              {
+                src: "node_modules/@falai/agent/README.md",
+                dest: "content",
+              },
+            ],
+          }),
+        ]),
   ],
-});
+}));

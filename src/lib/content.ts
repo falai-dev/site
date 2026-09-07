@@ -33,6 +33,20 @@ export const docs = contentMetadata.docs as ContentCategory[];
 export const examples = contentMetadata.examples as ContentCategory[];
 export const version = contentMetadata.version as string;
 
+/**
+ * Where "Get started" goes.
+ *
+ * Read off the metadata rather than written down. The landing page used to link to
+ * `/docs/guides/getting-started`, an address the package has not shipped for several versions,
+ * so the front door's main call to action led to the 404 page. Deriving it from the same list
+ * the router and the sidebar use means a renamed file cannot break it again.
+ */
+export const startHereRoute: string = (() => {
+    const category = docs.find((c) => c.slug === "start") ?? docs.find((c) => c.slug !== "overview");
+    const first = category?.items.find((item) => !item.hidden);
+    return category && first ? `/docs/${category.slug}/${first.slug}` : "/docs";
+})();
+
 export interface ResolvedRoute {
     kind: "doc" | "example";
     categorySlug: string;

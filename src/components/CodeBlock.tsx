@@ -1,6 +1,10 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import ShikiHighlighter from "react-shiki/core";
-import { highlighter, normalizeLanguage } from "../lib/highlighter";
+import { normalizeLanguage } from "../lib/languages";
+import { PlainCodeBlock } from "./PlainCodeBlock";
+
+/** The highlighter, as it exists once its module has loaded. */
+type Highlighter = (typeof import("../lib/highlighter"))["highlighter"];
 
 interface CodeBlockProps {
     /** Source code, raw. */
@@ -14,46 +18,41 @@ interface CodeBlockProps {
 }
 
 export function CodeBlock({ code, language, filename, bare = false }: CodeBlockProps) {
-    const [copied, setCopied] = useState(false);
     const lang = normalizeLanguage(language);
 
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(code);
-            setCopied(true);
-            window.setTimeout(() => setCopied(false), 1500);
-        } catch {
-            /* clipboard unavailable */
-        }
-    };
+    // The highlighter arrives after mount, never before. It is a Shiki core with a WebAssembly
+    // engine behind a top-level `await`, so a static import would drag all of it into whatever
+    // chunk this component lands in — and into the build's Bun render, which has no use for it
+    // and cannot run it. Fetching it here also means the server's markup and the browser's first
+    // render are the same plain block, which is what makes hydration match.
+    const [highlighter, setHighlighter] = useState<Highlighter | null>(null);
+
+    useEffect(() => {
+        let cancelled = false;
+        void import("../lib/highlighter").then((module) => {
+            if (!cancelled) setHighlighter(module.highlighter);
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     return (
-        <figure className={`code-block${bare ? " code-block--bare" : ""}`}>
-            {!bare && (
-                <header className="code-block__header">
-                    <span className="code-block__lang">{filename ?? lang}</span>
-                    <button
-                        type="button"
-                        className="code-block__copy"
-                        onClick={handleCopy}
-                        aria-label="Copy code"
-                    >
-                        {copied ? "Copied" : "Copy"}
-                    </button>
-                </header>
+        <PlainCodeBlock code={code} label={filename ?? lang} bare={bare}>
+            {highlighter && (
+                <ShikiHighlighter
+                    highlighter={highlighter}
+                    language={lang}
+                    theme={{ light: "github-light-default", dark: "github-dark-default" }}
+                    defaultColor="light-dark()"
+                    showLanguage={false}
+                    addDefaultStyles={false}
+                    className="code-block__shiki"
+                >
+                    {code}
+                </ShikiHighlighter>
             )}
-            <ShikiHighlighter
-                highlighter={highlighter}
-                language={lang}
-                theme={{ light: "github-light-default", dark: "github-dark-default" }}
-                defaultColor="light-dark()"
-                showLanguage={false}
-                addDefaultStyles={false}
-                className="code-block__shiki"
-            >
-                {code}
-            </ShikiHighlighter>
-        </figure>
+        </PlainCodeBlock>
     );
 }
 

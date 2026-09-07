@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { LazyCodeBlock } from "../components/CodeBlock.lazy";
+import { startHereRoute } from "../lib/content";
 
 const QUICKSTART = `import { Agent, OpenAIProvider } from "@falai/agent";
 
@@ -65,7 +66,7 @@ export function HomePage() {
           control. Schema-driven, predictable, production-ready.
         </p>
         <div className="landing__actions">
-          <Link to="/docs/guides/getting-started" className="btn btn--primary">
+          <Link to={startHereRoute} className="btn btn--primary">
             Get started
           </Link>
           <Link to="/docs" className="btn btn--ghost">
@@ -112,7 +113,7 @@ export function HomePage() {
         <h2>Ready to build?</h2>
         <p>The getting-started guide takes about ten minutes.</p>
         <div className="landing__actions">
-          <Link to="/docs/guides/getting-started" className="btn btn--primary">
+          <Link to={startHereRoute} className="btn btn--primary">
             Read the guide
           </Link>
           <Link to="/examples" className="btn btn--ghost">

@@ -5,7 +5,12 @@ import { createHighlighterCore, createOnigurumaEngine } from "react-shiki/core";
  * @falai/agent docs and examples. Keeps the bundle tiny by importing only what
  * we need (versus react-shiki's default ~1.2MB or web bundle).
  *
- * Add a language here when a doc starts using it.
+ * Add a language here when a doc starts using it, and to `SUPPORTED_LANGUAGES` in `languages.ts`.
+ *
+ * The top-level `await` and the WebAssembly engine are why nothing imports this module
+ * statically: `CodeBlock` reaches for it with a dynamic `import()` after it mounts, so the
+ * build's Bun render never evaluates it and no page pays for the engine until it has code to
+ * highlight.
  */
 export const highlighter = await createHighlighterCore({
     themes: [
@@ -26,38 +31,3 @@ export const highlighter = await createHighlighterCore({
     ],
     engine: createOnigurumaEngine(import("shiki/wasm")),
 });
-
-/**
- * Languages this highlighter knows about. Anything outside this list will
- * render as plain text — by design.
- */
-export const SUPPORTED_LANGUAGES = new Set([
-    "typescript",
-    "ts",
-    "tsx",
-    "javascript",
-    "js",
-    "jsx",
-    "json",
-    "bash",
-    "sh",
-    "shell",
-    "sql",
-    "prisma",
-    "markdown",
-    "md",
-    "mermaid",
-]);
-
-/**
- * Default language used when a fence has no language hint. Most of our docs
- * are TypeScript-first, so this is a reasonable fallback.
- */
-export const DEFAULT_LANGUAGE = "typescript";
-
-export function normalizeLanguage(language: string | undefined | null): string {
-    if (!language) return DEFAULT_LANGUAGE;
-    const lower = language.toLowerCase();
-    if (SUPPORTED_LANGUAGES.has(lower)) return lower;
-    return "text";
-}
