@@ -64,7 +64,7 @@ bun run preview
 
 ```bash
 # Generate content metadata from @falai/agent package
-bun run generate:metadata
+bun run metadata
 
 # Run type checking
 bun run typecheck
@@ -99,7 +99,7 @@ falai-site/
 
 ## 🔄 How It Works
 
-1. **Metadata Generation**: The `generate-content-metadata.ts` script scans the `@falai/agent` package for documentation and examples
+1. **Metadata Generation**: The `scripts/metadata.ts` script scans the `@falai/agent` package for documentation and examples
 2. **Static Content Copy**: Vite plugin copies markdown and code files to the build output
 3. **Dynamic Routing**: React Router creates routes for all docs and examples based on metadata
 4. **Runtime Fetching**: Content is fetched at runtime and rendered with syntax highlighting
@@ -124,7 +124,7 @@ The documentation content is automatically sourced from the `@falai/agent` packa
 
 1. Update the `@falai/agent` package version in `package.json`
 2. Run `bun install`
-3. Run `bun run generate:metadata` to update metadata
+3. Run `bun run metadata` to update metadata
 4. Build or start dev server
 
 ## 🚢 Deployment
