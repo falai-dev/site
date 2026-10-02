@@ -264,9 +264,9 @@ async function main(): Promise<void> {
         written += 1;
     }
 
-    // The not-found page, as a real file. Firebase serves `404.html` with a 404 status for every
-    // address that has none — which is only true now that the catch-all rewrite is gone from
-    // firebase.json. It carries the shell route rather than its own, so a reader who lands here
+    // The not-found page, as a real file. Cloudflare Pages serves `404.html` with a 404 status for
+    // every address that has none — which is only true while the site ships no `_redirects` catch-all.
+    // It carries the shell route rather than its own, so a reader who lands here
     // mounts fresh instead of hydrating the not-found page over the address they asked for.
     const notFound: PublicPage = {
         path: NOWHERE,
