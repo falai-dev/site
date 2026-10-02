@@ -38,7 +38,10 @@ jobs:
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
         run: bun run build
 
+      # A pull request only builds: with channelId live it would publish its
+      # own branch to the production site, then fail on the read-only token.
       - name: Deploy to Firebase
+        if: github.event_name == 'push'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
