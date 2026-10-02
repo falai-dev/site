@@ -5,7 +5,7 @@ import { docs, examples, type ContentCategory } from "../lib/content";
  *
  * Derived from the same content metadata the router and the sidebar read, so a page can never
  * exist in one and not the other: the build writes a file for exactly the routes the app knows
- * how to render, which is what lets `firebase.json` answer everything else with a real 404.
+ * how to render, which is what lets the Pages 404 page answer everything else with a real 404.
  */
 
 /** Marks which route a prerendered file carries, so `main.tsx` knows whether it may hydrate. */
