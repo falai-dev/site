@@ -2,52 +2,60 @@ import { Link } from "react-router-dom";
 import { LazyCodeBlock } from "../components/CodeBlock.lazy";
 import { startHereRoute } from "../lib/content";
 
-const QUICKSTART = `import { Agent, OpenAIProvider } from "@falai/agent";
+const INSTALL = `bun add @falai/agent`;
 
-const agent = new Agent({
-  name: "Booking Bot",
-  provider: new OpenAIProvider({
-    apiKey: process.env.OPENAI_API_KEY,
-    model: "gpt-4o-mini",
-  }),
+const FIRST_CALL = `const r = await agent.turn({ sessionId: "demo", message: "hi" });
+console.log(r.messages[0]?.text); // something like "Hi! What should I call you?"`;
+
+const QUICKSTART = `import { falai, GeminiProvider } from "@falai/agent";
+
+const f = falai().fields({
+  name: { type: "string", ask: "Ask for the person's name. Do not sound like a form." },
 });
 
-agent.route("book")
-  .collect({
-    hotel: { type: "string" },
-    guests: { type: "number" },
-    date: { type: "string", format: "date" },
-  })
-  .then(async ({ data }) => {
-    return \`Booked \${data.hotel} for \${data.guests} on \${data.date}.\`;
-  });
+const agent = f.agent({
+  name: "Ana",
+  provider: new GeminiProvider({ apiKey: process.env.GEMINI_API_KEY ?? "", model: "gemini-2.5-flash" }),
+  flows: [
+    f.flow({
+      id: "welcome",
+      name: "Welcome",
+      on: [{ message: [] }],
+      steps: [
+        { id: "name", collect: ["name"] },
+        { id: "help", prompt: "Thank them by name and ask how you can help." },
+      ],
+    }),
+  ],
+});
 
-await agent.send("Book Grand Hotel for 2 next Friday");`;
+const r = await agent.turn({ sessionId: "demo", message: "hi" });
+console.log(r.messages[0]?.text);`;
 
 const FEATURES = [
   {
-    title: "Schema-driven extraction",
-    body: "Define data contracts once. The model fills them — predictably, with validation built in.",
+    title: "Flows with steps",
+    body: "A flow is a trigger plus an ordered list of steps. A step talks, sends fixed text, runs your code, waits or branches.",
   },
   {
-    title: "Routes you can reason about",
-    body: "Conversations move through typed steps. Skip what's already known, run only what's missing.",
+    title: "Fields declared once",
+    body: "Say what each piece of data is and how to ask for it. The user can answer in any order, and a step is skipped when its data is already known.",
   },
   {
-    title: "Pluggable providers",
-    body: "OpenAI, Anthropic, Gemini, OpenRouter. Swap models without rewriting your flows.",
+    title: "At most two model calls per turn",
+    body: "One call understands the message. One call writes the reply. Every result reports llmCalls, so you can test the budget.",
   },
   {
-    title: "Tools with structure",
-    body: "Tool calls run through your code with metadata, validation, and lifecycle hooks.",
+    title: "One call, everything to do",
+    body: "agent.turn() takes a message, a wake-up, an event or a start. It returns the messages to send and the wake-ups to schedule. It never sends, sleeps or saves.",
   },
   {
-    title: "Optional persistence",
-    body: "Sessions survive restarts. Bring your DB or use a built-in adapter.",
+    title: "You own the storage",
+    body: "A Store has load and save. Memory, Postgres, Prisma, Redis, Mongo, SQLite and OpenSearch stores come with the package.",
   },
   {
-    title: "TypeScript-first",
-    body: "Generic Agent<TContext, TData> with full inference. No untyped escape hatches.",
+    title: "Flows as JSON",
+    body: "A FlowSpec is a flow stored as JSON. fromSpec turns it into a flow, so a flow written in an editor or a chat is the same object as one written in TypeScript.",
   },
 ];
 
@@ -62,8 +70,8 @@ export function HomePage() {
           that act like code.
         </h1>
         <p className="landing__lede">
-          A conversational state engine where the model understands and your code stays in
-          control. Schema-driven, predictable, production-ready.
+          Define flows, steps and tools in TypeScript. The AI is called only to understand what
+          the customer wrote and to write the reply. Your code decides the rest.
         </p>
         <div className="landing__actions">
           <Link to={startHereRoute} className="btn btn--primary">
@@ -71,6 +79,9 @@ export function HomePage() {
           </Link>
           <Link to="/docs" className="btn btn--ghost">
             Browse docs
+          </Link>
+          <Link to="/docs/migration/v3-to-v4" className="btn btn--ghost">
+            Coming from 3.x?
           </Link>
           <a
             className="btn btn--ghost"
@@ -86,17 +97,18 @@ export function HomePage() {
       <section className="landing__quickstart">
         <div className="landing__section-head">
           <h2>Quick start</h2>
-          <p>One agent, one route, one extraction. That's the whole thing.</p>
+          <p>Install the package, then run one turn. The agent behind that call is below.</p>
         </div>
-        <LazyCodeBlock code={QUICKSTART} language="typescript" filename="agent.ts" />
+        <LazyCodeBlock code={INSTALL} language="bash" filename="terminal" />
+        <LazyCodeBlock code={FIRST_CALL} language="typescript" filename="turn.ts" />
+        <LazyCodeBlock code={QUICKSTART} language="typescript" filename="ana.ts" />
       </section>
 
       <section className="landing__features">
         <div className="landing__section-head">
           <h2>Why @falai/agent</h2>
           <p>
-            Existing solutions are either too unpredictable to ship or too heavy to use. We
-            picked the middle.
+            Version 4 has one model: a flow starts when something happens, then runs its steps.
           </p>
         </div>
         <ul className="feature-grid">
@@ -111,7 +123,7 @@ export function HomePage() {
 
       <section className="landing__cta">
         <h2>Ready to build?</h2>
-        <p>The getting-started guide takes about ten minutes.</p>
+        <p>The tutorial builds one agent in five short pages.</p>
         <div className="landing__actions">
           <Link to={startHereRoute} className="btn btn--primary">
             Read the guide
