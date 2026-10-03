@@ -47,7 +47,9 @@ async function loadRenderer(): Promise<Renderer> {
     const entry = path.join(APP, "dist-ssr", "entry-server.js");
     const mod: unknown = await import(pathToFileURL(entry).href);
     if (!isRenderer(mod) || typeof mod.renderPage !== "function")
-        throw new Error(`prerender: ${entry} does not export renderPage — run vite build --ssr`);
+        throw new Error(
+            `prerender: ${entry} does not export renderPage. Run vite build --ssr`,
+        );
     return mod;
 }
 
@@ -65,8 +67,8 @@ async function loadTemplate(): Promise<string> {
     const template = await readFile(file, "utf8");
     if (template.includes(PRERENDERED_ROUTE_ATTR))
         throw new Error(
-            `prerender: ${file} is already a rendered page, not the template — ` +
-                "run `vite build` to regenerate it before prerendering again"
+            `prerender: ${file} is already a rendered page, not the template. ` +
+                "Run `vite build` to regenerate it before prerendering again",
         );
     return template;
 }
@@ -194,7 +196,10 @@ function assertRendered(file: string, html: string, template: string): void {
         throw new Error(`prerender: ${file} ${why}`);
     };
     const grew = html.length - template.length;
-    if (grew < 500) fail(`is only ${String(grew)} bytes bigger than the shell — nothing rendered`);
+    if (grew < 500)
+        fail(
+            `nothing rendered (${String(grew)} bytes added to the shell). Check the page route and rerun the build`,
+        );
     // `(?:<!--.*?-->)*` because the whole route table sits inside one Suspense boundary, and
     // React opens every boundary with a `<!--$-->` marker before the first real tag.
     if (!/<div id="root"[^>]*>(?:<!--.*?-->)*<[a-z]/.test(html))
@@ -217,8 +222,8 @@ async function loadContent(page: PublicPage): Promise<PreloadedFile | null> {
         return { path: page.contentPath, text: await readFile(source, "utf8") };
     } catch {
         throw new Error(
-            `prerender: ${page.path} renders ${page.contentPath}, which is not in dist/ — ` +
-                "is the content metadata newer than the installed @falai/agent?"
+            `prerender: ${page.path} renders ${page.contentPath}, which is not in dist/. ` +
+                "Check that the installed @falai/agent matches the content metadata, then rerun the build.",
         );
     }
 }

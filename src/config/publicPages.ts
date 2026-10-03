@@ -62,7 +62,7 @@ const DOCS_README = "/content/docs/README.md";
 const PAGES: PublicPage[] = [
     {
         path: "/",
-        title: "@falai/agent — type-safe AI agents in TypeScript",
+        title: "@falai/agent: type-safe AI agents in TypeScript",
         description:
             "A TypeScript framework for AI agents that follow a script. Define the data you need, the model fills it in, and your code decides what happens next.",
         priority: 1,
@@ -78,7 +78,8 @@ const PAGES: PublicPage[] = [
     {
         path: "/examples",
         title: "Examples" + SUFFIX,
-        description: "Runnable code that shows the framework in action — one file per idea.",
+        description:
+            "Code you can run to learn @falai/agent. Each example is one file.",
         priority: 0.8,
         changeFrequency: "weekly",
     },

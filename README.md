@@ -1,153 +1,62 @@
-AHGUIAHUIAHUIA
+# @falai/agent documentation site
 
-# 🤖 @falai/agent Documentation Site
+The docs and code examples for [@falai/agent](https://falai.dev). Built with React, TypeScript and Vite.
 
-Documentation website for the `@falai/agent` framework - Build intelligent, conversational AI agents with TypeScript.
+## Run locally
 
-## 🚀 Features
-
-- ✨ **Automated Content Generation**: Automatically fetches and renders documentation from `@falai/agent` package
-- 📚 **Documentation Pages**: All docs from the package's `/docs` folder rendered with syntax highlighting
-- 💻 **Live Examples**: Interactive code examples from the package's `/examples` folder
-- 🎨 **Modern UI**: Beautiful, responsive design with dark theme
-- ⚡ **Fast Performance**: Built with Vite + React for lightning-fast development and builds
-- 🔍 **Type-Safe**: Full TypeScript support throughout
-
-## 📦 Tech Stack
-
-- **Framework**: React 19 + TypeScript
-- **Build Tool**: Vite 7
-- **Package Manager**: Bun
-- **Routing**: React Router v7
-- **Markdown Rendering**: react-markdown with remark-gfm
-- **Syntax Highlighting**: rehype-highlight with highlight.js
-- **Linting**: ESLint with TypeScript support
-
-## 🛠️ Development
-
-### Prerequisites
-
-- [Bun](https://bun.sh) 1.0+ (recommended) or Node.js 18+
-- The `@falai/agent` package is automatically included as a dependency
-
-### Installation
+Install [Bun](https://bun.sh), then install the dependencies:
 
 ```bash
-# Clone the repository
-git clone <your-repo-url>
-cd falai-site
-
-# Install dependencies
 bun install
 ```
 
-### Development Server
+Start the site:
 
 ```bash
-# Start development server (includes metadata generation)
 bun run dev
 ```
 
-The site will be available at `http://localhost:5173`
+Open <http://localhost:5173>. The command reads the docs and examples from the installed `@falai/agent` package and generates `src/content-metadata.json` for the routes and sidebar.
 
-### Build for Production
+## Update the content
+
+Docs live in the agent package, not this repo. After a new package version is published, update it and regenerate the metadata:
 
 ```bash
-# Build the site
-bun run build
-
-# Preview the production build
-bun run preview
+bun run sync
 ```
 
-### Other Commands
+To regenerate metadata without updating the package, run `bun run metadata`.
+
+## Check your changes
 
 ```bash
-# Generate content metadata from @falai/agent package
-bun run metadata
-
-# Run type checking
-bun run typecheck
-
-# Run linter
 bun run lint
+bun run typecheck
 ```
 
-## 📁 Project Structure
+Lint checks the site copy for em dashes, including escaped strings and HTML entities. Use a period, comma, colon or parentheses instead. Internal source comments are not copy.
 
-```
-falai-site/
-├── scripts/
-│   └── generate-content-metadata.ts  # Generates metadata from @falai/agent package
-├── src/
-│   ├── components/
-│   │   ├── CodeViewer.tsx           # Renders code examples
-│   │   ├── Header.tsx               # Site header with navigation
-│   │   ├── Layout.tsx               # Main layout wrapper
-│   │   ├── MarkdownViewer.tsx       # Renders markdown documentation
-│   │   └── Sidebar.tsx              # Sidebar navigation
-│   ├── pages/
-│   │   ├── DocPage.tsx              # Individual documentation page
-│   │   ├── ExamplePage.tsx          # Individual example page
-│   │   └── HomePage.tsx             # Landing page with README
-│   ├── App.tsx                      # Main app component with routing
-│   ├── App.css                      # Global styles
-│   └── content-metadata.json        # Auto-generated metadata
-├── vite.config.ts                   # Vite configuration
-└── package.json
+## Build
+
+```bash
+bun run build
 ```
 
-## 🔄 How It Works
+The build checks the package docs and examples before copying them. If that check fails, fix the copy in `@falai/agent`, publish the corrected version, then run `bun run sync` here. Do not strip punctuation from the content at runtime.
 
-1. **Metadata Generation**: The `scripts/metadata.ts` script scans the `@falai/agent` package for documentation and examples
-2. **Static Content Copy**: Vite plugin copies markdown and code files to the build output
-3. **Dynamic Routing**: React Router creates routes for all docs and examples based on metadata
-4. **Runtime Fetching**: Content is fetched at runtime and rendered with syntax highlighting
+The `dist` folder contains the rendered HTML for each page, the browser assets, the docs and examples under `/content`, a sitemap, robots.txt and a 404 page. `dist-ssr` is the server-rendering bundle used by the build; it is not the site to upload.
 
-## 🎨 Customization
+Preview the built site with `bun run preview`. Deploy `dist` to a static host such as Cloudflare Pages, Netlify or Vercel.
 
-### Styling
+## Edit the site
 
-The site uses CSS custom properties (CSS variables) for easy theming. Edit `src/App.css` to customize:
-
-```css
-:root {
-  --bg-primary: #0a0a0b;
-  --accent-primary: #6366f1;
-  /* ... more variables */
-}
-```
-
-### Content
-
-The documentation content is automatically sourced from the `@falai/agent` package. To update:
-
-1. Update the `@falai/agent` package version in `package.json`
-2. Run `bun install`
-3. Run `bun run metadata` to update metadata
-4. Build or start dev server
-
-## 🚢 Deployment
-
-The site is a static SPA that can be deployed to any static hosting service:
-
-- **Vercel**: Connect your repository and deploy automatically
-- **Netlify**: Same as Vercel, with automatic builds
-- **GitHub Pages**: Deploy the `dist` folder
-- **Cloudflare Pages**: Connect and deploy
-
-### Build Output
-
-The `dist` folder contains:
-
-- Static HTML, CSS, and JS
-- `/content/` directory with all markdown and code files
-- Optimized and minified assets
-
-## 📝 License
+- `src/pages`: landing page, docs and examples pages.
+- `src/components`: navigation, Markdown and code viewers.
+- `src/config/publicPages.ts`: page titles and descriptions.
+- `src/App.css` and `src/index.css`: styles.
+- `scripts/metadata.ts`: content routes and sidebar data.
+- `scripts/prerender.ts`: rendered pages and search metadata.
+- `vite.config.ts`: copies the package content into the build.
 
 MIT © 2025
-
----
-
-**Built with ❤️ for the @falai/agent community**
