@@ -6,10 +6,11 @@
   "type": "module",
   "scripts": {
     "dev": "bun run metadata && vite",
-    "build": "bun run metadata && tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && bun scripts/prerender.ts",
+    "build": "bun run metadata && bun run check:content && tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && bun scripts/prerender.ts",
     "metadata": "bun scripts/metadata.ts",
     "sync": "bun update @falai/agent --latest && bun run metadata",
-    "lint": "eslint .",
+    "lint": "eslint . && bun scripts/check-no-em-dash.ts",
+    "check:content": "bun scripts/check-no-em-dash.ts node_modules/@falai/agent/docs node_modules/@falai/agent/examples node_modules/@falai/agent/README.md",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "deploy": "bun run build && bunx wrangler pages deploy dist --project-name=falai-site --branch=main"
