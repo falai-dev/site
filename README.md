@@ -35,15 +35,11 @@ bun run lint
 bun run typecheck
 ```
 
-Lint checks the site copy for em dashes, including escaped strings and HTML entities. Use a period, comma, colon or parentheses instead. Internal source comments are not copy.
-
 ## Build
 
 ```bash
 bun run build
 ```
-
-The build checks the package docs and examples before copying them. If that check fails, fix the copy in `@falai/agent`, publish the corrected version, then run `bun run sync` here. Do not strip punctuation from the content at runtime.
 
 The `dist` folder contains the rendered HTML for each page, the browser assets, the docs and examples under `/content`, a sitemap, robots.txt and a 404 page. `dist-ssr` is the server-rendering bundle used by the build; it is not the site to upload.
 
