@@ -1,6 +1,6 @@
 # @falai/agent documentation site
 
-The docs and code examples for [@falai/agent](https://falai.dev). Built with React, TypeScript and Vite.
+The docs and code examples for [@falai/agent](https://falai.dev). Built with React, TypeScript 7 and Vite.
 
 ## Run locally
 
@@ -29,6 +29,8 @@ bun run sync
 To regenerate metadata without updating the package, run `bun run metadata`.
 
 ## Check your changes
+
+`bun run lint` uses oxlint. Run `bun run metadata` before the first typecheck so the generated routes exist.
 
 ```bash
 bun run lint
