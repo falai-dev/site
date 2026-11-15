@@ -23,7 +23,7 @@ export function rehypeGithubSlug() {
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line typescript/no-explicit-any
 function extractText(node: any): string {
   if (node.type === "text") {
     return node.value;
